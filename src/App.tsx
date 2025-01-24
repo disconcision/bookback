@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
 import _ from "lodash";
+import { parse as parseDomain } from "psl";
 
 interface BookmarkData {
   url: string;
@@ -36,14 +37,30 @@ interface BookmarkEntryProps {
   onToggle?: () => void;
 }
 
+const FRIENDLY_NAMES: Record<string, string> = {
+  "reddit.com": "Reddit",
+  "github.com": "GitHub",
+  "youtube.com": "YouTube",
+  "medium.com": "Medium",
+  "twitter.com": "Twitter",
+  "x.com": "Twitter",
+  // Add more as needed
+};
 const extractDomain = (url: string): string => {
   try {
     const { hostname } = new URL(url);
-    const parts = hostname.split(".");
-    if (parts.length > 2) {
-      parts.shift();
+
+    // Check friendly names first
+    const friendlyName = FRIENDLY_NAMES[hostname];
+    if (friendlyName) return friendlyName;
+
+    // Use psl to get the registered domain
+    const parsed = parseDomain(hostname);
+    if (parsed && "sld" in parsed && parsed.sld) {
+      return parsed.sld;
     }
-    return parts.join(".");
+
+    return hostname;
   } catch {
     return "";
   }
@@ -76,7 +93,7 @@ const BookmarkEntry: React.FC<BookmarkEntryProps> = ({
   return (
     <div className="bookmark-entry">
       {showYear && <span className="year-text">{year}</span>}
-      <span className="date-text">{format(bookmark.date, "MMMM d")}</span>
+      <span className="date-text">{format(bookmark.date, "MMM d")}</span>
       <span className="domain-text">{extractDomain(cleanedUrl)}</span>
       <span
         className="title-text"
@@ -93,8 +110,8 @@ const BookmarkEntry: React.FC<BookmarkEntryProps> = ({
             onToggle?.();
           }}
         >
-          <span style={{ fontSize: remainingCount > 99 ? "8px" : "10px" }}>
-            {remainingCount > 999 ? "1k+" : remainingCount}
+          <span style={{ fontSize: remainingCount > 99 ? "11px" : "11px" }}>
+            {remainingCount > 999 ? "1k+" : "+ " + remainingCount}
           </span>
         </div>
       )}
@@ -295,6 +312,12 @@ export default function App() {
   return (
     <div className="container">
       <div className="control-bar">
+        <button
+          onClick={() => setShowControls(!showControls)}
+          className={`control-input gear-button ${showControls ? "ml-2" : ""}`}
+        >
+          ⚙️
+        </button>
         {showControls && (
           <div className="control-panel">
             <ControlPanel
@@ -313,15 +336,13 @@ export default function App() {
             />
           </div>
         )}
-        <button
-          onClick={() => setShowControls(!showControls)}
-          className={`control-input gear-button ${showControls ? "ml-2" : ""}`}
-        >
-          ⚙️
-        </button>
       </div>
 
       <div className="bookmark-list">
+        <span>
+          <span className="title-book">🔖</span>
+          <span className="title-back">🔙</span>
+        </span>
         {sortedYears.map(({ year, bookmarks }) => (
           <div key={year}>
             {entriesPerYear === 1 ? (

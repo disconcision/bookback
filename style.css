@@ -17,13 +17,18 @@ body {
 .control-bar {
   display: flex;
   height: 40px;
-  justify-content: flex-end;
+  /* justify-content: flex-end; */
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.control-bar:has(.control-panel-content) {
+  background-color: #333;
+  border-radius: 0 14px 14px 20px;
 }
 
 .control-panel {
   display: flex;
-  background-color: #333;
-  border-radius: 12px;
   margin-right: 8px;
   flex: 1;
 }
@@ -68,11 +73,16 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 4px 0;
+  /* padding: 4px 0; */
   font-size: 1.7em;
+  filter: saturate(0) brightness(0.6);
+  transition: rotate 0.2s ease-in-out;
 }
 .control-input.gear-button {
   background-color: #0000;
+}
+.gear-button:hover {
+  rotate: 359deg;
 }
 
 .bookmark-list {
@@ -97,19 +107,25 @@ body {
 }
 
 .year-text {
-  color: #171717;
+  color: #c25554;
 }
 
 .counter-circle {
-  width: 20px;
+  width: 44px;
   height: 20px;
-  background-color: #666;
-  border-radius: 50%;
+  background-color: #464646;
+  border-radius: 0.7em;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   margin-left: 8px;
+  scale: 0.7;
+  border-bottom: 1px solid #6a6a6a;
+  color: #202020;
+}
+.counter-circle:hover {
+  color: #eabb75;
 }
 
 .counter-text {
@@ -118,6 +134,7 @@ body {
 
 .date-text {
   color: #7c7a7a;
+  text-wrap-mode: nowrap;
 }
 
 .title-text {
@@ -125,7 +142,7 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  flex: 1;
+  /* flex: 1; */
   cursor: pointer;
 }
 
@@ -134,11 +151,16 @@ body {
 }
 
 .domain-text {
-  color: #22d6a6;
+  color: #d5ba8e;
   max-width: 200px;
-  overflow: hidden;
+  /* overflow: hidden; */
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-wrap-mode: nowrap;
+}
+
+.domain-text:hover {
+  color: #f0c4b8;
 }
 
 .search-input {
@@ -152,4 +174,21 @@ body {
 
 input[type="checkbox"] {
   filter: saturate(0);
+}
+
+span.title-book,
+span.title-back {
+  display: inline-block;
+  font-size: 4em;
+  transition: scale 0.1s ease-out;
+}
+span.title-book:hover,
+span.title-book:has(+ span.title-back:hover) {
+  filter: saturate(10);
+  scale: 1.1;
+}
+span.title-back:hover,
+span.title-book:hover + span.title-back {
+  filter: invert(1) sepia(1) saturate(1.2) brightness(1);
+  scale: 0.9;
 }
